@@ -1,0 +1,114 @@
+<!-- Smart Dashboard - HTML & CSS -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Smart Dashboard</h1>
+        <input type="text" id="cityInput" placeholder="Enter city" />
+        <button id="searchBtn">Search</button>
+        
+        <div class="section" id="weather">Loading Weather...</div>
+        <div class="section" id="news">Loading News...</div>
+        <div class="section" id="crypto">Loading Crypto Prices...</div>
+    </div>
+
+    <script>
+        // Smart Dashboard - Major JavaScript Project
+        // Covers API Key usage, Fetch API, ES6+, DOM Manipulation, etc.
+
+        // Configuration - Replace with your own API keys
+        const WEATHER_API_KEY = 'your_openweathermap_key';
+        const NEWS_API_KEY = 'your_newsapi_key';
+        const CRYPTO_API_KEY = 'your_crypto_api_key';
+
+        // Fetch Weather Data with Error Handling
+        async function fetchWeather(city) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                const data = await response.json();
+                if (!data.main) throw new Error("Invalid API response");
+                document.getElementById('weather').innerHTML = `🌤 ${data.main.temp}°C in ${data.name}`;
+            } catch (error) {
+                console.error(error);
+                document.getElementById('weather').innerHTML = `⚠️ ${error.message}`;
+            }
+        }
+
+        // Fetch News Data with Error Handling
+        async function fetchNews() {
+            const url = `https://api.thenewsapi.com/v1/news/top?api_token=${NEWS_API_KEY}&locale=us&limit=5`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                const data = await response.json();
+                if (!data.data) throw new Error("Invalid API response");
+                document.getElementById('news').innerHTML = data.data.map(article => `<p>${article.title}</p>`).join('');
+            } catch (error) {
+                console.error(error);
+                document.getElementById('news').innerHTML = `⚠️ ${error.message}`;
+            }
+        }
+
+
+        // Fetch Crypto Prices with Error Handling
+        async function fetchCrypto() {
+            const url = `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                const data = await response.json();
+                if (!data.bitcoin || !data.ethereum) throw new Error("Invalid API response");
+                document.getElementById('crypto').innerHTML = `₿ Bitcoin: $${data.bitcoin.usd} | Ξ Ethereum: $${data.ethereum.usd}`;
+            } catch (error) {
+                document.getElementById('crypto').innerHTML = `⚠️ ${error.message}`;
+            }
+        }
+
+        // Event Listener for Search
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const city = document.getElementById('cityInput').value;
+            fetchWeather(city);
+        });
+
+        // Load Dashboard Data on Start
+        fetchWeather('New York');
+        fetchNews();
+        fetchCrypto();
+    </script>
+</body>
+</html>
